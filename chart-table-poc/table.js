@@ -14,15 +14,15 @@ function init() {
     for (let i = 0; i < 27; i++) {
         uniqueKeys.push(`Key-${i + 1}`);
     }
-    // 1. 模擬 Call SQL 拿到的超大的一維 Object
-    const sqlResultMock = {};
+    // 1. 模擬 Call SQL 拿到的寬表陣列 (Wide Table)
+    const mockWideData = [];
     uniqueKeys.forEach((key) => {
+        const rowData = { uniqueId: key };
         metrics.forEach((metric) => {
             // 隨機產生一個很長的小數點數值來測試 truncate (e.g. "200.235123123")
-            const mockValue = (Math.random() * 1000).toString();
-            const dataKey = `${key}_${metric}`;
-            sqlResultMock[dataKey] = mockValue;
+            rowData[metric] = (Math.random() * 1000).toString();
         });
+        mockWideData.push(rowData);
     });
     // 2. 初始化 TableLayout 進行排版與截斷運算
     const layoutConfig = {
@@ -58,7 +58,7 @@ function init() {
             backgroundColor: '#ffffff'
         }
     };
-    const layouter = new TableLayout(ctx, metrics, uniqueKeys, sqlResultMock, layoutConfig, styleConfig);
+    const layouter = new TableLayout(ctx, metrics, uniqueKeys, mockWideData, layoutConfig, styleConfig);
     // 3. 取得計算過後的 cells 陣列
     const cellsToDraw = layouter.generateCells();
     // 4. 將所有算好的格子畫到 Canvas 上

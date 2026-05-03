@@ -75,7 +75,6 @@ function init() {
 
     // 3. 取得計算過後的 cells 陣列
     const cellsToDraw = layouter.generateCells();
-
     // 4. 將所有算好的格子畫到 Canvas 上
     cellsToDraw.forEach(cell => {
         drawTextBox(ctx, cell);
