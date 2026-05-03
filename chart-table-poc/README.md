@@ -22,7 +22,7 @@
 3. 複製並貼上以下指令，然後按下 Enter 鍵：
 
 ```bash
-npx -y -p typescript tsc chart-table-poc/table.ts
+npx -y -p typescript tsc -p chart-table-poc
 ```
 
 4. 如果指令跑完且沒有出現任何紅色的錯誤訊息，就代表編譯成功了！你的 `table.js` 已經被更新。
@@ -35,7 +35,7 @@ npx -y -p typescript tsc chart-table-poc/table.ts
 如果你覺得每次修改完都要手動輸入指令很麻煩，你可以改用這個「監視」指令：
 
 ```bash
-npx -y -p typescript tsc --watch chart-table-poc/table.ts
+npx -y -p typescript tsc -p chart-table-poc --watch
 ```
 
 這個指令跑下去之後，終端機就不會結束。接下來**只要你在 VS Code 裡面修改 `table.ts` 並「存檔」**，它就會立刻在背後幫你自動編譯成 `table.js`！你只需要切到瀏覽器重新整理就能看見結果。
