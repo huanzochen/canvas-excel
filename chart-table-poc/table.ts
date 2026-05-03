@@ -20,7 +20,8 @@ function init() {
     }
 
     const firstColWidth = 100;
-    const cellWidth = 80;
+    // 動態計算儲存格寬度：畫布總寬減去第一欄寬度後，平分給所有 Unique Keys
+    const cellWidth = (rect.width - firstColWidth) / uniqueKeys.length;
     const headerHeight = 60; // 預留較高空間給未來實作「多層 header」合併儲存格
     const cellHeight = 30;
 

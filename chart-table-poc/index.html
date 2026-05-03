@@ -16,23 +16,21 @@
         }
         .canvas-container {
             width: 100%;
-            height: 400px; /* fixed height for scroll demo or let canvas handle it */
-            overflow: auto;
+            height: 400px;
             background: #fff;
             border: 1px solid #ddd;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        /* Make canvas large enough to hold all 27 columns */
         #chart-table-canvas {
             display: block;
-            width: 2400px; /* 120px + 27 * 80px approx */
-            height: 300px; /* 60px + 5 * 30px approx */
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
     <h2>Chart Data Table PoC</h2>
-    <p>Scroll horizontally to see all generated Unique Keys.</p>
+    <p>Canvas will fit to the container width. All columns are squeezed into the view.</p>
     <div class="canvas-container">
         <canvas id="chart-table-canvas"></canvas>
     </div>
