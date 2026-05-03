@@ -58,8 +58,8 @@ class TableLayout {
     }
 
     // 將資料轉為繪圖所需的 BBox 與 Text
-    public generateCells(): any[] {
-        const cells: any[] = [];
+    public generateCells(): TextBoxParams[] {
+        const cells: TextBoxParams[] = [];
         const { totalWidth, firstColWidth, headerHeight, cellHeight } = this.layoutConfig;
         const styles = this.styleConfig;
         

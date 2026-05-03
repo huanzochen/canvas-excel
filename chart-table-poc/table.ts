@@ -77,9 +77,7 @@ function init() {
     const cellsToDraw = layouter.generateCells();
 
     // 4. 將所有算好的格子畫到 Canvas 上
-    // @ts-ignore
     cellsToDraw.forEach(cell => {
-        // @ts-ignore
         drawTextBox(ctx, cell);
     });
 }
