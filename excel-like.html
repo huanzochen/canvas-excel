@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Excel PoC</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #excel-canvas {
+            display: block; /* Remove default inline gap */
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="excel-canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('excel-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // configuration for the grid
+        const cellWidth = 100;
+        const cellHeight = 25;
+
+        function resizeCanvas() {
+            // Support high DPI displays for crisp rendering
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            
+            ctx.scale(dpr, dpr);
+            canvas.style.width = `${rect.width}px`;
+            canvas.style.height = `${rect.height}px`;
+
+            draw();
+        }
+
+        function draw() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Get current logical size
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
+
+            const cols = Math.ceil(width / cellWidth);
+            const rows = Math.ceil(height / cellHeight);
+
+            // Draw grid lines
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+
+            // Draw vertical lines
+            for (let i = 0; i <= cols; i++) {
+                const x = i * cellWidth;
+                ctx.beginPath();
+                // Add 0.5 to coordinates to draw crisp 1px lines in canvas
+                ctx.moveTo(x + 0.5, 0);
+                ctx.lineTo(x + 0.5, height);
+                ctx.stroke();
+            }
+            debugger
+
+            // Draw horizontal lines
+            for (let j = 0; j <= rows; j++) {
+                const y = j * cellHeight;
+                ctx.beginPath();
+                ctx.moveTo(0, y + 0.5);
+                ctx.lineTo(width, y + 0.5);
+                ctx.stroke();
+            }
+
+            // Example: Draw header background and some text
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, width, cellHeight);
+            
+            ctx.fillStyle = '#333333';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            
+            for (let i = 1; i < cols; i++) {
+                // Column headers A, B, C...
+                const text = String.fromCharCode(64 + i);
+                const x = (i * cellWidth) + (cellWidth / 2);
+                ctx.fillText(text, x, cellHeight / 2);
+            }
+        }
+
+        // Make canvas fill the screen initially
+        canvas.style.width = '100vw';
+        canvas.style.height = '100vh';
+
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Initial setup
+        resizeCanvas();
+    </script>
+</body>
+</html>
