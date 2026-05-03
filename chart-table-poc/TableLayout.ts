@@ -12,11 +12,13 @@ interface TableStyleConfig {
 }
 
 class TableLayout {
+    private rowMap: Map<string, Record<string, string | number>>;
+
     constructor(
         private ctx: CanvasRenderingContext2D,
         private metrics: string[],
         private uniqueKeys: string[],
-        private data: Record<string, string>,
+        private data: Array<Record<string, string | number>>,
         private layoutConfig: {
             totalWidth: number;
             firstColWidth: number;
@@ -24,7 +26,12 @@ class TableLayout {
             cellHeight: number;
         },
         private styleConfig: TableStyleConfig
-    ) {}
+    ) {
+        this.rowMap = new Map();
+        for (const row of this.data) {
+            this.rowMap.set(String(row.uniqueId), row);
+        }
+    }
 
     private getFontString(config: FontConfig): string {
         return `${config.fontWeight} ${config.fontSize}px ${config.fontFamily}`;
@@ -130,9 +137,10 @@ class TableLayout {
                 const x1 = firstColWidth + colIndex * cellWidth;
                 const x2 = x1 + cellWidth;
                 
-                // 從一維的 Mock Object 取值 (使用自定義的 key 組合，例如 Key-1_N)
-                const dataKey = `${key}_${metric}`;
-                const val = this.data[dataKey] !== undefined ? this.data[dataKey] : '-';
+                // 從建立好的 rowMap 取值
+                const row = this.rowMap.get(key);
+                const rawVal = row && row[metric] !== undefined ? row[metric] : '-';
+                const val = String(rawVal);
                 
                 cells.push({
                     text: this.truncateText(val, Math.max(0, cellWidth - padding), dataCellFont),

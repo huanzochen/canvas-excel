@@ -17,15 +17,15 @@ function init() {
         uniqueKeys.push(`Key-${i+1}`);
     }
 
-    // 1. 模擬 Call SQL 拿到的超大的一維 Object
-    const sqlResultMock: Record<string, string> = {};
+    // 1. 模擬 Call SQL 拿到的寬表陣列 (Wide Table)
+    const mockWideData: Array<Record<string, string | number>> = [];
     uniqueKeys.forEach((key) => {
+        const rowData: Record<string, string | number> = { uniqueId: key };
         metrics.forEach((metric) => {
             // 隨機產生一個很長的小數點數值來測試 truncate (e.g. "200.235123123")
-            const mockValue = (Math.random() * 1000).toString();
-            const dataKey = `${key}_${metric}`;
-            sqlResultMock[dataKey] = mockValue;
+            rowData[metric] = (Math.random() * 1000).toString();
         });
+        mockWideData.push(rowData);
     });
 
     // 2. 初始化 TableLayout 進行排版與截斷運算
@@ -68,7 +68,7 @@ function init() {
         ctx,
         metrics,
         uniqueKeys,
-        sqlResultMock,
+        mockWideData,
         layoutConfig,
         styleConfig
     );
