@@ -17,14 +17,14 @@ function init() {
         uniqueKeys.push(`Key-${i+1}`);
     }
 
-    // 1. 模擬 Call SQL 拿到的超大 Object
-    const sqlResultMock: Record<string, Record<string, string>> = {};
+    // 1. 模擬 Call SQL 拿到的超大的一維 Object
+    const sqlResultMock: Record<string, string> = {};
     uniqueKeys.forEach((key) => {
-        sqlResultMock[key] = {};
         metrics.forEach((metric) => {
             // 隨機產生一個很長的小數點數值來測試 truncate (e.g. "200.235123123")
             const mockValue = (Math.random() * 1000).toString();
-            sqlResultMock[key][metric] = mockValue;
+            const dataKey = `${key}_${metric}`;
+            sqlResultMock[dataKey] = mockValue;
         });
     });
 

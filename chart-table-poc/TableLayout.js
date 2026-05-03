@@ -102,8 +102,9 @@ class TableLayout {
             this.uniqueKeys.forEach((key, colIndex) => {
                 const x1 = firstColWidth + colIndex * cellWidth;
                 const x2 = x1 + cellWidth;
-                // 從 Mock 的 Object 取值
-                const val = this.data[key] && this.data[key][metric] ? this.data[key][metric] : '-';
+                // 從一維的 Mock Object 取值 (使用自定義的 key 組合，例如 Key-1_N)
+                const dataKey = `${key}_${metric}`;
+                const val = this.data[dataKey] !== undefined ? this.data[dataKey] : '-';
                 cells.push({
                     text: this.truncateText(val, Math.max(0, cellWidth - padding), dataCellFont),
                     bbox: {
