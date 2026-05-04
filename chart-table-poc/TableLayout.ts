@@ -20,9 +20,7 @@ class TableLayout {
         private uniqueKeys: string[],
         private data: Array<Record<string, string | number>>,
         private layoutConfig: {
-            startX: number;
-            startY: number;
-            totalWidth: number;
+            bbox: { topLeft: { x: number; y: number }; bottomRight: { x: number; y: number } };
             firstColWidth: number;
             headerHeight: number;
             cellHeight: number;
@@ -69,9 +67,14 @@ class TableLayout {
     // 將資料轉為繪圖所需的 BBox 與 Text
     public generateCells(): TextBoxParams[] {
         const cells: TextBoxParams[] = [];
-        const { startX, startY, totalWidth, firstColWidth, headerHeight, cellHeight } = this.layoutConfig;
+        const { bbox, firstColWidth, headerHeight, cellHeight } = this.layoutConfig;
         const styles = this.styleConfig;
         
+        const startX = bbox.topLeft.x;
+        const startY = bbox.topLeft.y;
+        const totalWidth = bbox.bottomRight.x - bbox.topLeft.x;
+        const totalHeight = bbox.bottomRight.y - bbox.topLeft.y;
+
         // 為了極端情況，如果 uniqueKeys 為空或計算出負數，保護一下
         const validKeyCount = Math.max(1, this.uniqueKeys.length);
         const cellWidth = Math.max(10, (totalWidth - firstColWidth) / validKeyCount);
@@ -116,7 +119,21 @@ class TableLayout {
         const rowHeaderFont = this.getFontString(styles.rowHeader);
         const dataCellFont = this.getFontString(styles.dataCell);
 
-        this.metrics.forEach((metric, rowIndex) => {
+        const availableHeight = totalHeight - headerHeight;
+        const maxPossibleRows = Math.floor(availableHeight / cellHeight);
+        
+        let displayMetrics = this.metrics;
+        let isTruncated = false;
+
+        // 如果列數超過可容納的數量，保留最後一列顯示 "..."
+        if (this.metrics.length > maxPossibleRows) {
+            isTruncated = true;
+            // 如果連一列都放不下，就只留 0，至少不要當掉；通常 maxPossibleRows 至少大於 1
+            const visibleRowCount = Math.max(0, maxPossibleRows - 1);
+            displayMetrics = this.metrics.slice(0, visibleRowCount);
+        }
+
+        displayMetrics.forEach((metric, rowIndex) => {
             const y1 = startY + headerHeight + rowIndex * cellHeight;
             const y2 = y1 + cellHeight;
 
@@ -158,6 +175,25 @@ class TableLayout {
                 });
             });
         });
+
+        // 繪製最後一列的截斷提示 "⋮" (vertical ellipsis)
+        if (isTruncated && maxPossibleRows > 0) {
+            const y1 = startY + headerHeight + displayMetrics.length * cellHeight;
+            const y2 = y1 + cellHeight;
+
+            cells.push({
+                text: '⋮',
+                bbox: {
+                    topLeft: { x: startX, y: y1 },
+                    bottomRight: { x: startX + totalWidth, y: y2 }
+                },
+                fontSize: styles.rowHeader.fontSize, // 沿用 rowHeader 字體大小
+                fontFamily: styles.rowHeader.fontFamily,
+                fontWeight: 'bold',
+                backgroundColor: '#ffffff', // 或自訂背景色
+                textColor: '#999999' // 用灰色表示省略
+            });
+        }
 
         return cells;
     }

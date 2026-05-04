@@ -30,15 +30,14 @@ function init() {
 
     // 2. 初始化 TableLayout 進行排版與截斷運算
     // 假設外部算好的 bbox
-    const bbox = { topLeft: { x: 100, y: 200 }, bottomRight: { x: 2000, y: 2000 } };
+    // 這裡我們故意設定一個比較小的 bottom Y 來測試行數截斷功能
+    const bbox = { topLeft: { x: 100, y: 50 }, bottomRight: { x: 1600, y: 350 } };
     
     const layoutConfig = {
-        totalWidth: bbox.bottomRight.x - bbox.topLeft.x,
+        bbox: bbox,
         firstColWidth: 100,
         headerHeight: 60,
-        cellHeight: 30,
-        startX: bbox.topLeft.x,
-        startY: bbox.topLeft.y
+        cellHeight: 50
     };
 
     // 由外部決定字體樣式配置
