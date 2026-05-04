@@ -74,6 +74,7 @@ function init() {
     firstColWidth: 100,
     headerHeight: 60,
     cellHeight: 50,
+    showRowHeader: true, // 可以透過設定為 false 來隱藏左側的 Row Header
   };
 
   // 由外部決定字體樣式配置

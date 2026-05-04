@@ -22,6 +22,7 @@ class TableLayout {
     firstColWidth: number;
     headerHeight: number;
     cellHeight: number;
+    showRowHeader?: boolean;
   };
   private styleConfig: TableStyleConfig;
 
@@ -42,6 +43,7 @@ class TableLayout {
       firstColWidth: number;
       headerHeight: number;
       cellHeight: number;
+      showRowHeader?: boolean;
     };
     styleConfig: TableStyleConfig;
   }) {
@@ -91,7 +93,13 @@ class TableLayout {
   // 將資料轉為繪圖所需的 BBox 與 Text
   public generateCells(): TextBoxParams[] {
     const cells: TextBoxParams[] = [];
-    const { bbox, firstColWidth, headerHeight, cellHeight } = this.layoutConfig;
+    const {
+      bbox,
+      firstColWidth,
+      headerHeight,
+      cellHeight,
+      showRowHeader = true,
+    } = this.layoutConfig;
     const styles = this.styleConfig;
 
     const startX = bbox.topLeft.x;
@@ -99,30 +107,34 @@ class TableLayout {
     const totalWidth = bbox.bottomRight.x - bbox.topLeft.x;
     const totalHeight = bbox.bottomRight.y - bbox.topLeft.y;
 
+    const rowHeaderWidth = showRowHeader ? firstColWidth : 0;
+
     // 為了極端情況，如果 uniqueKeys 為空或計算出負數，保護一下
     const validKeyCount = Math.max(1, this.uniqueKeys.length);
-    const cellWidth = Math.max(10, (totalWidth - firstColWidth) / validKeyCount);
+    const cellWidth = Math.max(10, (totalWidth - rowHeaderWidth) / validKeyCount);
 
     const padding = 10; // 左右預留 padding 空間
 
     // --- 1. 左上角 Header ---
-    cells.push({
-      text: 'Metrics \\ Keys',
-      bbox: {
-        topLeft: { x: startX, y: startY },
-        bottomRight: { x: startX + firstColWidth, y: startY + headerHeight },
-      },
-      fontSize: styles.cornerHeader.fontSize,
-      fontFamily: styles.cornerHeader.fontFamily,
-      fontWeight: styles.cornerHeader.fontWeight,
-      backgroundColor: styles.cornerHeader.backgroundColor || '#e6e6e6',
-      textColor: styles.cornerHeader.textColor || '#333333',
-    });
+    if (showRowHeader) {
+      cells.push({
+        text: 'Metrics \\ Keys',
+        bbox: {
+          topLeft: { x: startX, y: startY },
+          bottomRight: { x: startX + rowHeaderWidth, y: startY + headerHeight },
+        },
+        fontSize: styles.cornerHeader.fontSize,
+        fontFamily: styles.cornerHeader.fontFamily,
+        fontWeight: styles.cornerHeader.fontWeight,
+        backgroundColor: styles.cornerHeader.backgroundColor || '#e6e6e6',
+        textColor: styles.cornerHeader.textColor || '#333333',
+      });
+    }
 
     // --- 2. 繪上方 Headers (X 軸 Unique Keys) ---
     const columnHeaderFont = this.getFontString(styles.columnHeader);
     this.uniqueKeys.forEach((key, colIndex) => {
-      const leftX = startX + firstColWidth + colIndex * cellWidth;
+      const leftX = startX + rowHeaderWidth + colIndex * cellWidth;
       const rightX = leftX + cellWidth;
 
       cells.push({
@@ -162,22 +174,24 @@ class TableLayout {
       const bottomY = topY + cellHeight;
 
       // 左側 Metric Header
-      cells.push({
-        text: this.truncateText(metric, Math.max(0, firstColWidth - padding), rowHeaderFont),
-        bbox: {
-          topLeft: { x: startX, y: topY },
-          bottomRight: { x: startX + firstColWidth, y: bottomY },
-        },
-        fontSize: styles.rowHeader.fontSize,
-        fontFamily: styles.rowHeader.fontFamily,
-        fontWeight: styles.rowHeader.fontWeight,
-        backgroundColor: styles.rowHeader.backgroundColor || '#fafafa',
-        textColor: styles.rowHeader.textColor || '#333333',
-      });
+      if (showRowHeader) {
+        cells.push({
+          text: this.truncateText(metric, Math.max(0, rowHeaderWidth - padding), rowHeaderFont),
+          bbox: {
+            topLeft: { x: startX, y: topY },
+            bottomRight: { x: startX + rowHeaderWidth, y: bottomY },
+          },
+          fontSize: styles.rowHeader.fontSize,
+          fontFamily: styles.rowHeader.fontFamily,
+          fontWeight: styles.rowHeader.fontWeight,
+          backgroundColor: styles.rowHeader.backgroundColor || '#fafafa',
+          textColor: styles.rowHeader.textColor || '#333333',
+        });
+      }
 
       // 內部資料格
       this.uniqueKeys.forEach((key, colIndex) => {
-        const leftX = startX + firstColWidth + colIndex * cellWidth;
+        const leftX = startX + rowHeaderWidth + colIndex * cellWidth;
         const rightX = leftX + cellWidth;
 
         // 從建立好的 rowMap 取值
