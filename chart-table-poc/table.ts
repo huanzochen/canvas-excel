@@ -16,6 +16,8 @@ enum StatisticsMetrics {
 enum RenderKeys {
   Q1 = 'Q1',
   Q3 = 'Q3',
+  p99 = 'p99',
+  p95 = 'p95',
 }
 
 const canvas = document.getElementById('chart-table-canvas') as HTMLCanvasElement;
@@ -44,6 +46,9 @@ function init() {
   const metrics: string[] = userSelectedMetrics.flatMap((metric) => {
     if (metric === StatisticsMetrics.Q1Q3) {
       return [RenderKeys.Q1, RenderKeys.Q3];
+    }
+    if (metric === StatisticsMetrics.Percentile) {
+      return [RenderKeys.p95, RenderKeys.p99];
     }
     return [metric as string];
   });

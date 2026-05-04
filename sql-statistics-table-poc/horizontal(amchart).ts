@@ -14,8 +14,10 @@ export enum StatisticsMetrics {
 
 // 這是最終要畫在畫面上 (也是 SQL 查詢出來) 的實體欄位名稱
 export enum RenderKeys {
-  Q1 = 'Q1',
-  Q3 = 'Q3',
+  Q1 = 'q1',
+  Q3 = 'q3',
+  p99 = 'p99',
+  p95 = 'p95',
 }
 
 // ============================================================================
@@ -46,6 +48,17 @@ export function buildFetchStatsSql(
           .map((y) => `COALESCE(quantile_cont("${y}", 0.75), 0)`)
           .join(' + ');
         return [`${q1Expr} AS "${RenderKeys.Q1}"`, `${q3Expr} AS "${RenderKeys.Q3}"`];
+      }
+
+      if (metric === StatisticsMetrics.Percentile) {
+        // 1對多：展開成 p95 與 p99 兩個顯示欄位
+        const p95Expr = numericalYs
+          .map((y) => `COALESCE(quantile_cont("${y}", 0.95), 0)`)
+          .join(' + ');
+        const p99Expr = numericalYs
+          .map((y) => `COALESCE(quantile_cont("${y}", 0.99), 0)`)
+          .join(' + ');
+        return [`${p95Expr} AS "${RenderKeys.p95}"`, `${p99Expr} AS "${RenderKeys.p99}"`];
       }
 
       if (metric === StatisticsMetrics.Range) {
