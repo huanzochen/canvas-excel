@@ -68,14 +68,14 @@ function init() {
         }
     };
 
-    const layouter = new TableLayout(
+    const layouter = new TableLayout({
         ctx,
         metrics,
         uniqueKeys,
-        mockWideData,
+        data: mockWideData,
         layoutConfig,
         styleConfig
-    );
+    });
 
     // 3. 取得計算過後的 cells 陣列
     const cellsToDraw = layouter.generateCells();

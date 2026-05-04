@@ -13,20 +13,44 @@ interface TableStyleConfig {
 
 class TableLayout {
     private rowMap: Map<string, Record<string, string | number>>;
+    private ctx: CanvasRenderingContext2D;
+    private metrics: string[];
+    private uniqueKeys: string[];
+    private data: Array<Record<string, string | number>>;
+    private layoutConfig: {
+        bbox: { topLeft: { x: number; y: number }; bottomRight: { x: number; y: number } };
+        firstColWidth: number;
+        headerHeight: number;
+        cellHeight: number;
+    };
+    private styleConfig: TableStyleConfig;
 
-    constructor(
-        private ctx: CanvasRenderingContext2D,
-        private metrics: string[],
-        private uniqueKeys: string[],
-        private data: Array<Record<string, string | number>>,
-        private layoutConfig: {
+    constructor({
+        ctx,
+        metrics,
+        uniqueKeys,
+        data,
+        layoutConfig,
+        styleConfig
+    }: {
+        ctx: CanvasRenderingContext2D;
+        metrics: string[];
+        uniqueKeys: string[];
+        data: Array<Record<string, string | number>>;
+        layoutConfig: {
             bbox: { topLeft: { x: number; y: number }; bottomRight: { x: number; y: number } };
             firstColWidth: number;
             headerHeight: number;
             cellHeight: number;
-        },
-        private styleConfig: TableStyleConfig
-    ) {
+        };
+        styleConfig: TableStyleConfig;
+    }) {
+        this.ctx = ctx;
+        this.metrics = metrics;
+        this.uniqueKeys = uniqueKeys;
+        this.data = data;
+        this.layoutConfig = layoutConfig;
+        this.styleConfig = styleConfig;
         this.rowMap = new Map();
         for (const row of this.data) {
             this.rowMap.set(String(row.uniqueId), row);
