@@ -1,0 +1,24 @@
+{
+  "name": "canvas-excel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huanzochen/canvas-excel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/huanzochen/canvas-excel/issues"
+  },
+  "homepage": "https://github.com/huanzochen/canvas-excel#readme",
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  }
+}
