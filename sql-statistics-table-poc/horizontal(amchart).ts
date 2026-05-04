@@ -1,5 +1,5 @@
 // 這是 User 可以選擇的選項 (可能一對一或一對多)
-export enum StatisticMetrics {
+export enum StatisticsMetrics {
   Mean = "Mean",
   Median = "Median",
   Range = "Range",
@@ -37,7 +37,7 @@ export function buildFetchStatsSql(
   // 2. 根據 Metric 產生對應的 SELECT 語句
   // 這裡回傳陣列，因為一個 Metric 可能會展開成多個欄位 (例如 Q1&Q3)
   const combinedAggSelects = statisticMetrics.flatMap(metric => {
-    if (metric === StatisticMetrics.Q1Q3) {
+    if (metric === StatisticsMetrics.Q1Q3) {
       // 1對多：展開成 Q1 與 Q3 兩個顯示欄位
       const q1Expr = numericalYs
         .map(y => `COALESCE(quantile_cont("${y}", 0.25), 0)`)
@@ -51,7 +51,7 @@ export function buildFetchStatsSql(
       ];
     }
 
-    if (metric === StatisticMetrics.Range) {
+    if (metric === StatisticsMetrics.Range) {
       // 特別運算：MAX - MIN
       const sumExpr = numericalYs
         .map(y => `COALESCE(MAX("${y}") - MIN("${y}"), 0)`)
@@ -59,7 +59,7 @@ export function buildFetchStatsSql(
       return [`${sumExpr} AS "${metric}"`];
     }
 
-    if (metric === StatisticMetrics.Count) {
+    if (metric === StatisticsMetrics.Count) {
       // 如果有多個 Y，通常 Count 是把每個欄位的 Count 加總，或是算總筆數
       // 這裡以範例的 COUNT(1) 來說，如果是加總 Y：
       const sumExpr = numericalYs
@@ -68,7 +68,7 @@ export function buildFetchStatsSql(
       return [`${sumExpr} AS "${metric}"`];
     }
 
-    if (metric === StatisticMetrics.Sum) {
+    if (metric === StatisticsMetrics.Sum) {
       const sumExpr = numericalYs
         .map(y => `COALESCE(SUM("${y}"), 0)`)
         .join(' + ');
@@ -77,10 +77,10 @@ export function buildFetchStatsSql(
 
     // 預設 1:1 轉換，例如 Mean, Min, Max 等
     const metricToSqlFunc: Record<string, string> = {
-      [StatisticMetrics.Mean]: 'AVG',
-      [StatisticMetrics.Max]: 'MAX',
-      [StatisticMetrics.Min]: 'MIN',
-      [StatisticMetrics.Median]: 'MEDIAN',
+      [StatisticsMetrics.Mean]: 'AVG',
+      [StatisticsMetrics.Max]: 'MAX',
+      [StatisticsMetrics.Min]: 'MIN',
+      [StatisticsMetrics.Median]: 'MEDIAN',
     };
     
     const sqlFunc = metricToSqlFunc[metric] || metric.toUpperCase();

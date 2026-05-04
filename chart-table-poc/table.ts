@@ -1,4 +1,4 @@
-enum StatisticMetrics {
+enum StatisticsMetrics {
     Mean = "Mean",
     Median = "Median",
     Range = "Range",
@@ -12,7 +12,7 @@ enum StatisticMetrics {
   }
 
 // 為了 POC 方便，這裡先複製一份 RenderKeys 的定義。
-// 在實際專案中，會將 StatisticMetrics 與 RenderKeys 拆分到獨立的 types.ts 供前後端共用
+// 在實際專案中，會將 StatisticsMetrics 與 RenderKeys 拆分到獨立的 types.ts 供前後端共用
 enum RenderKeys {
     Q1 = "Q1",
     Q3 = "Q3"
@@ -32,12 +32,12 @@ function init() {
     ctx.scale(dpr, dpr);
 
     // 定義 user 選的規格
-    const userSelectedMetrics = [StatisticMetrics.Count, StatisticMetrics.Mean, StatisticMetrics.Q1Q3, StatisticMetrics.Min, StatisticMetrics.Max];
+    const userSelectedMetrics = [StatisticsMetrics.Count, StatisticsMetrics.Mean, StatisticsMetrics.Q1Q3, StatisticsMetrics.Min, StatisticsMetrics.Max];
     
     // 攤平: 將需要展開的 metrics (如 Q1Q3) 轉換成實際在表格與 SQL 中對應的 keys
-    // 使用 string 陣列以相容 RenderKeys 與 StatisticMetrics
+    // 使用 string 陣列以相容 RenderKeys 與 StatisticsMetrics
     const metrics: string[] = userSelectedMetrics.flatMap(metric => {
-        if (metric === StatisticMetrics.Q1Q3) {
+        if (metric === StatisticsMetrics.Q1Q3) {
             return [RenderKeys.Q1, RenderKeys.Q3]
         }
         return [metric as string];
