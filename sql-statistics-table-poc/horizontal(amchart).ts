@@ -1,4 +1,5 @@
-enum StatisticMetrics {
+// 這是 User 可以選擇的選項 (可能一對一或一對多)
+export enum StatisticMetrics {
   Mean = "Mean",
   Median = "Median",
   Range = "Range",
@@ -9,6 +10,12 @@ enum StatisticMetrics {
   Count = "Count",
   Sum = "Sum",
   Percentile = "Percentile"
+}
+
+// 這是最終要畫在畫面上 (也是 SQL 查詢出來) 的實體欄位名稱
+export enum RenderKeys {
+  Q1 = "Q1",
+  Q3 = "Q3"
 }
 
 
@@ -39,8 +46,8 @@ export function buildFetchStatsSql(
         .map(y => `COALESCE(quantile_cont("${y}", 0.75), 0)`)
         .join(' + ');
       return [
-        `${q1Expr} AS "Q1"`,
-        `${q3Expr} AS "Q3"`
+        `${q1Expr} AS "${RenderKeys.Q1}"`,
+        `${q3Expr} AS "${RenderKeys.Q3}"`
       ];
     }
 

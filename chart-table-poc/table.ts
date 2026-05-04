@@ -10,6 +10,13 @@ enum StatisticMetrics {
     Sum = "Sum",
     Percentile = "Percentile"
   }
+
+// 為了 POC 方便，這裡先複製一份 RenderKeys 的定義。
+// 在實際專案中，會將 StatisticMetrics 與 RenderKeys 拆分到獨立的 types.ts 供前後端共用
+enum RenderKeys {
+    Q1 = "Q1",
+    Q3 = "Q3"
+}
   
 
 const canvas = document.getElementById('chart-table-canvas') as HTMLCanvasElement;
@@ -28,11 +35,12 @@ function init() {
     const userSelectedMetrics = [StatisticMetrics.Count, StatisticMetrics.Mean, StatisticMetrics.Q1Q3, StatisticMetrics.Min, StatisticMetrics.Max];
     
     // 攤平: 將需要展開的 metrics (如 Q1Q3) 轉換成實際在表格與 SQL 中對應的 keys
-    const metrics = userSelectedMetrics.flatMap(metric => {
+    // 使用 string 陣列以相容 RenderKeys 與 StatisticMetrics
+    const metrics: string[] = userSelectedMetrics.flatMap(metric => {
         if (metric === StatisticMetrics.Q1Q3) {
-            return ['Q1', 'Q3'];
+            return [RenderKeys.Q1, RenderKeys.Q3]
         }
-        return [metric];
+        return [metric as string];
     });
 
     const uniqueKeys: string[] = [];
