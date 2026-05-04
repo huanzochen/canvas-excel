@@ -76,8 +76,8 @@ function init() {
 
   const layoutConfig = {
     bbox: bbox,
-    firstColWidth: 100,
-    headerHeight: 60,
+    rowHeaderWidth: 100,
+    columnHeaderHeight: 60,
     cellHeight: 50,
     showRowHeader: true, // 可以透過設定為 false 來隱藏左側的 Row Header
   };

@@ -19,8 +19,8 @@ class TableLayout {
   private data: Array<Record<string, string | number>>;
   private layoutConfig: {
     bbox: { topLeft: { x: number; y: number }; bottomRight: { x: number; y: number } };
-    firstColWidth: number;
-    headerHeight: number;
+    rowHeaderWidth: number;
+    columnHeaderHeight: number;
     cellHeight: number;
     showRowHeader?: boolean;
   };
@@ -40,8 +40,8 @@ class TableLayout {
     data: Array<Record<string, string | number>>;
     layoutConfig: {
       bbox: { topLeft: { x: number; y: number }; bottomRight: { x: number; y: number } };
-      firstColWidth: number;
-      headerHeight: number;
+      rowHeaderWidth: number;
+      columnHeaderHeight: number;
       cellHeight: number;
       showRowHeader?: boolean;
     };
@@ -95,8 +95,8 @@ class TableLayout {
     const cells: TextBoxParams[] = [];
     const {
       bbox,
-      firstColWidth,
-      headerHeight,
+      rowHeaderWidth: configRowHeaderWidth,
+      columnHeaderHeight,
       cellHeight,
       showRowHeader = true,
     } = this.layoutConfig;
@@ -107,7 +107,7 @@ class TableLayout {
     const totalWidth = bbox.bottomRight.x - bbox.topLeft.x;
     const totalHeight = bbox.bottomRight.y - bbox.topLeft.y;
 
-    const rowHeaderWidth = showRowHeader ? firstColWidth : 0;
+    const rowHeaderWidth = showRowHeader ? configRowHeaderWidth : 0;
 
     // 為了極端情況，如果 uniqueKeys 為空或計算出負數，保護一下
     const validKeyCount = Math.max(1, this.uniqueKeys.length);
@@ -121,7 +121,7 @@ class TableLayout {
         text: 'Metrics \\ Keys',
         bbox: {
           topLeft: { x: startX, y: startY },
-          bottomRight: { x: startX + rowHeaderWidth, y: startY + headerHeight },
+          bottomRight: { x: startX + rowHeaderWidth, y: startY + columnHeaderHeight },
         },
         fontSize: styles.cornerHeader.fontSize,
         fontFamily: styles.cornerHeader.fontFamily,
@@ -141,7 +141,7 @@ class TableLayout {
         text: this.truncateText(key, Math.max(0, cellWidth - padding), columnHeaderFont),
         bbox: {
           topLeft: { x: leftX, y: startY },
-          bottomRight: { x: rightX, y: startY + headerHeight },
+          bottomRight: { x: rightX, y: startY + columnHeaderHeight },
         },
         fontSize: styles.columnHeader.fontSize,
         fontFamily: styles.columnHeader.fontFamily,
@@ -155,7 +155,7 @@ class TableLayout {
     const rowHeaderFont = this.getFontString(styles.rowHeader);
     const dataCellFont = this.getFontString(styles.dataCell);
 
-    const availableHeight = totalHeight - headerHeight;
+    const availableHeight = totalHeight - columnHeaderHeight;
     const maxPossibleRows = Math.floor(availableHeight / cellHeight);
 
     let displayMetrics = this.metrics;
@@ -170,7 +170,7 @@ class TableLayout {
     }
 
     displayMetrics.forEach((metric, rowIndex) => {
-      const topY = startY + headerHeight + rowIndex * cellHeight;
+      const topY = startY + columnHeaderHeight + rowIndex * cellHeight;
       const bottomY = topY + cellHeight;
 
       // 左側 Metric Header
@@ -216,7 +216,7 @@ class TableLayout {
 
     // 繪製最後一列的截斷提示 "⋮" (vertical ellipsis)
     if (isTruncated && maxPossibleRows > 0) {
-      const topY = startY + headerHeight + displayMetrics.length * cellHeight;
+      const topY = startY + columnHeaderHeight + displayMetrics.length * cellHeight;
       const bottomY = topY + cellHeight;
 
       cells.push({
