@@ -5,6 +5,7 @@
 ## 開發與修改說明
 
 這個資料夾內包含三個檔案：
+
 - `index.html`: 負責網頁結構與載入 JavaScript
 - `table.ts`: TypeScript 原始碼，負責 Canvas 繪圖核心邏輯 (包含 `drawTextBox` 等)
 - `table.js`: 編譯後的 JavaScript 檔案，會由 `index.html` 直接載入
@@ -17,7 +18,7 @@
 
 請跟著以下**最簡單的步驟**：
 
-1. 打開你的 Terminal (終端機)。如果你是用 VS Code，可以按下快捷鍵 `Ctrl + \``，或是從上方選單選擇 `Terminal` -> `New Terminal`。
+1. 打開你的 Terminal (終端機)。如果你是用 VS Code，可以按下快捷鍵 `Ctrl + \``，或是從上方選單選擇 `Terminal`->`New Terminal`。
 2. 確認你的終端機路徑是在專案的「根目錄」(也就是 `canvas-excel` 資料夾)。
 3. 複製並貼上以下指令，然後按下 Enter 鍵：
 

@@ -34,5 +34,6 @@ npx ts-node "vertical(chartJs).ts"
 ## 預期輸出結果
 
 執行後，你會在終端機看到兩個主要部分：
+
 1. **Task 1: Generated SQL** - 根據設定動態生成的 DuckDB SQL 語法。
 2. **Task 2: Canvas Dictionary / Chart Config** - 將模擬的資料結果轉換為前端圖表或 Canvas 表格所需的資料結構。
