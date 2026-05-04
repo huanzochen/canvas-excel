@@ -13,12 +13,26 @@ export function buildFetchStatsSql(
   // GROUP BY 欄位
   const groupByCols = xAxesAndGroups.map(col => `"${col}"`).join(', ');
 
+  // 定義 Metric 到 SQL Function 的對應表
+  const metricToSqlFunc: Record<string, string> = {
+    'Mean': 'AVG',
+    'Average': 'AVG',
+    'Avg': 'AVG',
+    'N': 'COUNT',
+    'Min': 'MIN',
+    'Max': 'MAX'
+  };
+
   // 2. 多個 Y 欄位合併計算
   const combinedAggSelects = statisticMetrics.map(metric => {
+    // 取得對應的 SQL Function，如果沒有定義就預設轉大寫
+    const sqlFunc = metricToSqlFunc[metric] || metric.toUpperCase();
+
     const sumExpr = numericalYs
-      .map(y => `COALESCE(${metric}("${y}"), 0)`)
+      .map(y => `COALESCE(${sqlFunc}("${y}"), 0)`)
       .join(' + ');
-    // 產出例如：COALESCE(MIN("Revenue"), 0) + COALESCE(MIN("Profit"), 0) AS "Total_MIN"
+    // 使用 sqlFunc 進行 SQL 查詢，但是 AS 保持原本的 metric
+    // 這樣查詢出來的資料 Key 就會是 user 選擇的名稱 (如: "Mean", "N")
     return `${sumExpr} AS "${metric}"`; // 直接使用 Metric 名稱，方便對齊 Canvas 的 Key
   }).join(',\n    ');
 
@@ -76,6 +90,7 @@ const mockWideData: WideTableRow[] = [
   { uniqueId: 'Europe-Tablets', MIN: 12.0, MAX: 1800.0, AVG: 900.0 }
 ];
 
-console.log("========== Task 2: Canvas Dictionary Object ==========");
-const canvasDict = transformToCanvasDictionary(mockWideData);
-console.log(JSON.stringify(canvasDict, null, 2));
+// No Need
+// console.log("========== Task 2: Canvas Dictionary Object ==========");
+// const canvasDict = transformToCanvasDictionary(mockWideData);
+// console.log(JSON.stringify(canvasDict, null, 2));
