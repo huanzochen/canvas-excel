@@ -49,7 +49,7 @@ function init() {
   });
 
   const uniqueKeys: string[] = [];
-  for (let i = 0; i < 27; i++) {
+  for (let i = 0; i < 6; i++) {
     uniqueKeys.push(`Key-${i + 1}`);
   }
 
@@ -67,7 +67,7 @@ function init() {
   // 2. 初始化 TableLayout 進行排版與截斷運算
   // 假設外部算好的 bbox
   // 這裡我們故意設定一個比較小的 bottom Y 來測試行數截斷功能
-  const bbox = { topLeft: { x: 100, y: 50 }, bottomRight: { x: 1600, y: 350 } };
+  const bbox = { topLeft: { x: 100, y: 50 }, bottomRight: { x: 800, y: 350 } };
 
   const layoutConfig = {
     bbox: bbox,
