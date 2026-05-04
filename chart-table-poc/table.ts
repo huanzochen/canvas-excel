@@ -1,3 +1,17 @@
+enum StatisticMetrics {
+    Mean = "Mean",
+    Median = "Median",
+    Range = "Range",
+    Max = "Max",
+    Min = "Min",
+    Q1Q3 = "Q1Q3",
+    StdDev = "StdDev",
+    Count = "Count",
+    Sum = "Sum",
+    Percentile = "Percentile"
+  }
+  
+
 const canvas = document.getElementById('chart-table-canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
 
@@ -10,8 +24,17 @@ function init() {
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
 
-    // 定義規格
-    const metrics = ['N', 'Mean', 'Min', 'Max', 'Avg'];
+    // 定義 user 選的規格
+    const userSelectedMetrics = [StatisticMetrics.Count, StatisticMetrics.Mean, StatisticMetrics.Q1Q3, StatisticMetrics.Min, StatisticMetrics.Max];
+    
+    // 攤平: 將需要展開的 metrics (如 Q1Q3) 轉換成實際在表格與 SQL 中對應的 keys
+    const metrics = userSelectedMetrics.flatMap(metric => {
+        if (metric === StatisticMetrics.Q1Q3) {
+            return ['Q1', 'Q3'];
+        }
+        return [metric];
+    });
+
     const uniqueKeys: string[] = [];
     for (let i = 0; i < 27; i++) {
         uniqueKeys.push(`Key-${i+1}`);

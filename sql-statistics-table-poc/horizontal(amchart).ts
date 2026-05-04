@@ -1,3 +1,17 @@
+enum StatisticMetrics {
+  Mean = "Mean",
+  Median = "Median",
+  Range = "Range",
+  Max = "Max",
+  Min = "Min",
+  Q1Q3 = "Q1Q3",
+  StdDev = "StdDev",
+  Count = "Count",
+  Sum = "Sum",
+  Percentile = "Percentile"
+}
+
+
 // ============================================================================
 // 任務 1：實作 buildFetchStatsSql 函式 (動態組裝 DuckDB SQL - 寬表版)
 // ============================================================================
@@ -13,27 +27,61 @@ export function buildFetchStatsSql(
   // GROUP BY 欄位
   const groupByCols = xAxesAndGroups.map(col => `"${col}"`).join(', ');
 
-  // 定義 Metric 到 SQL Function 的對應表
-  const metricToSqlFunc: Record<string, string> = {
-    'Mean': 'AVG',
-    'Average': 'AVG',
-    'Avg': 'AVG',
-    'N': 'COUNT',
-    'Min': 'MIN',
-    'Max': 'MAX'
-  };
+  // 2. 根據 Metric 產生對應的 SELECT 語句
+  // 這裡回傳陣列，因為一個 Metric 可能會展開成多個欄位 (例如 Q1&Q3)
+  const combinedAggSelects = statisticMetrics.flatMap(metric => {
+    if (metric === StatisticMetrics.Q1Q3) {
+      // 1對多：展開成 Q1 與 Q3 兩個顯示欄位
+      const q1Expr = numericalYs
+        .map(y => `COALESCE(quantile_cont("${y}", 0.25), 0)`)
+        .join(' + ');
+      const q3Expr = numericalYs
+        .map(y => `COALESCE(quantile_cont("${y}", 0.75), 0)`)
+        .join(' + ');
+      return [
+        `${q1Expr} AS "Q1"`,
+        `${q3Expr} AS "Q3"`
+      ];
+    }
 
-  // 2. 多個 Y 欄位合併計算
-  const combinedAggSelects = statisticMetrics.map(metric => {
-    // 取得對應的 SQL Function，如果沒有定義就預設轉大寫
+    if (metric === StatisticMetrics.Range) {
+      // 特別運算：MAX - MIN
+      const sumExpr = numericalYs
+        .map(y => `COALESCE(MAX("${y}") - MIN("${y}"), 0)`)
+        .join(' + ');
+      return [`${sumExpr} AS "${metric}"`];
+    }
+
+    if (metric === StatisticMetrics.Count) {
+      // 如果有多個 Y，通常 Count 是把每個欄位的 Count 加總，或是算總筆數
+      // 這裡以範例的 COUNT(1) 來說，如果是加總 Y：
+      const sumExpr = numericalYs
+        .map(y => `COALESCE(COUNT("${y}"), 0)`)
+        .join(' + ');
+      return [`${sumExpr} AS "${metric}"`];
+    }
+
+    if (metric === StatisticMetrics.Sum) {
+      const sumExpr = numericalYs
+        .map(y => `COALESCE(SUM("${y}"), 0)`)
+        .join(' + ');
+      return [`${sumExpr} AS "${metric}"`];
+    }
+
+    // 預設 1:1 轉換，例如 Mean, Min, Max 等
+    const metricToSqlFunc: Record<string, string> = {
+      [StatisticMetrics.Mean]: 'AVG',
+      [StatisticMetrics.Max]: 'MAX',
+      [StatisticMetrics.Min]: 'MIN',
+      [StatisticMetrics.Median]: 'MEDIAN',
+    };
+    
     const sqlFunc = metricToSqlFunc[metric] || metric.toUpperCase();
-
     const sumExpr = numericalYs
       .map(y => `COALESCE(${sqlFunc}("${y}"), 0)`)
       .join(' + ');
-    // 使用 sqlFunc 進行 SQL 查詢，但是 AS 保持原本的 metric
-    // 這樣查詢出來的資料 Key 就會是 user 選擇的名稱 (如: "Mean", "N")
-    return `${sumExpr} AS "${metric}"`; // 直接使用 Metric 名稱，方便對齊 Canvas 的 Key
+    
+    return [`${sumExpr} AS "${metric}"`];
   }).join(',\n    ');
 
   // 3. 組裝 SQL (直接產出寬表，不使用 UNPIVOT)
