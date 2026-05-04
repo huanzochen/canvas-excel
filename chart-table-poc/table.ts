@@ -29,11 +29,16 @@ function init() {
     });
 
     // 2. 初始化 TableLayout 進行排版與截斷運算
+    // 假設外部算好的 bbox
+    const bbox = { topLeft: { x: 100, y: 200 }, bottomRight: { x: 2000, y: 2000 } };
+    
     const layoutConfig = {
-        totalWidth: rect.width,
+        totalWidth: bbox.bottomRight.x - bbox.topLeft.x,
         firstColWidth: 100,
         headerHeight: 60,
-        cellHeight: 30
+        cellHeight: 30,
+        startX: bbox.topLeft.x,
+        startY: bbox.topLeft.y
     };
 
     // 由外部決定字體樣式配置

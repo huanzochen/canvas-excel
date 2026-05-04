@@ -20,6 +20,8 @@ class TableLayout {
         private uniqueKeys: string[],
         private data: Array<Record<string, string | number>>,
         private layoutConfig: {
+            startX: number;
+            startY: number;
             totalWidth: number;
             firstColWidth: number;
             headerHeight: number;
@@ -67,7 +69,7 @@ class TableLayout {
     // 將資料轉為繪圖所需的 BBox 與 Text
     public generateCells(): TextBoxParams[] {
         const cells: TextBoxParams[] = [];
-        const { totalWidth, firstColWidth, headerHeight, cellHeight } = this.layoutConfig;
+        const { startX, startY, totalWidth, firstColWidth, headerHeight, cellHeight } = this.layoutConfig;
         const styles = this.styleConfig;
         
         // 為了極端情況，如果 uniqueKeys 為空或計算出負數，保護一下
@@ -80,8 +82,8 @@ class TableLayout {
         cells.push({
             text: 'Metrics \\ Keys',
             bbox: {
-                topLeft: { x: 0, y: 0 },
-                bottomRight: { x: firstColWidth, y: headerHeight }
+                topLeft: { x: startX, y: startY },
+                bottomRight: { x: startX + firstColWidth, y: startY + headerHeight }
             },
             fontSize: styles.cornerHeader.fontSize,
             fontFamily: styles.cornerHeader.fontFamily,
@@ -93,14 +95,14 @@ class TableLayout {
         // --- 2. 繪上方 Headers (X 軸 Unique Keys) ---
         const columnHeaderFont = this.getFontString(styles.columnHeader);
         this.uniqueKeys.forEach((key, colIndex) => {
-            const x1 = firstColWidth + colIndex * cellWidth;
+            const x1 = startX + firstColWidth + colIndex * cellWidth;
             const x2 = x1 + cellWidth;
 
             cells.push({
                 text: this.truncateText(key, Math.max(0, cellWidth - padding), columnHeaderFont),
                 bbox: {
-                    topLeft: { x: x1, y: 0 },
-                    bottomRight: { x: x2, y: headerHeight }
+                    topLeft: { x: x1, y: startY },
+                    bottomRight: { x: x2, y: startY + headerHeight }
                 },
                 fontSize: styles.columnHeader.fontSize,
                 fontFamily: styles.columnHeader.fontFamily,
@@ -115,15 +117,15 @@ class TableLayout {
         const dataCellFont = this.getFontString(styles.dataCell);
 
         this.metrics.forEach((metric, rowIndex) => {
-            const y1 = headerHeight + rowIndex * cellHeight;
+            const y1 = startY + headerHeight + rowIndex * cellHeight;
             const y2 = y1 + cellHeight;
 
             // 左側 Metric Header
             cells.push({
                 text: this.truncateText(metric, Math.max(0, firstColWidth - padding), rowHeaderFont),
                 bbox: {
-                    topLeft: { x: 0, y: y1 },
-                    bottomRight: { x: firstColWidth, y: y2 }
+                    topLeft: { x: startX, y: y1 },
+                    bottomRight: { x: startX + firstColWidth, y: y2 }
                 },
                 fontSize: styles.rowHeader.fontSize,
                 fontFamily: styles.rowHeader.fontFamily,
@@ -134,7 +136,7 @@ class TableLayout {
 
             // 內部資料格
             this.uniqueKeys.forEach((key, colIndex) => {
-                const x1 = firstColWidth + colIndex * cellWidth;
+                const x1 = startX + firstColWidth + colIndex * cellWidth;
                 const x2 = x1 + cellWidth;
                 
                 // 從建立好的 rowMap 取值
