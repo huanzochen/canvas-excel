@@ -122,14 +122,14 @@ class TableLayout {
     // --- 2. 繪上方 Headers (X 軸 Unique Keys) ---
     const columnHeaderFont = this.getFontString(styles.columnHeader);
     this.uniqueKeys.forEach((key, colIndex) => {
-      const x1 = startX + firstColWidth + colIndex * cellWidth;
-      const x2 = x1 + cellWidth;
+      const leftX = startX + firstColWidth + colIndex * cellWidth;
+      const rightX = leftX + cellWidth;
 
       cells.push({
         text: this.truncateText(key, Math.max(0, cellWidth - padding), columnHeaderFont),
         bbox: {
-          topLeft: { x: x1, y: startY },
-          bottomRight: { x: x2, y: startY + headerHeight },
+          topLeft: { x: leftX, y: startY },
+          bottomRight: { x: rightX, y: startY + headerHeight },
         },
         fontSize: styles.columnHeader.fontSize,
         fontFamily: styles.columnHeader.fontFamily,
@@ -158,15 +158,15 @@ class TableLayout {
     }
 
     displayMetrics.forEach((metric, rowIndex) => {
-      const y1 = startY + headerHeight + rowIndex * cellHeight;
-      const y2 = y1 + cellHeight;
+      const topY = startY + headerHeight + rowIndex * cellHeight;
+      const bottomY = topY + cellHeight;
 
       // 左側 Metric Header
       cells.push({
         text: this.truncateText(metric, Math.max(0, firstColWidth - padding), rowHeaderFont),
         bbox: {
-          topLeft: { x: startX, y: y1 },
-          bottomRight: { x: startX + firstColWidth, y: y2 },
+          topLeft: { x: startX, y: topY },
+          bottomRight: { x: startX + firstColWidth, y: bottomY },
         },
         fontSize: styles.rowHeader.fontSize,
         fontFamily: styles.rowHeader.fontFamily,
@@ -177,8 +177,8 @@ class TableLayout {
 
       // 內部資料格
       this.uniqueKeys.forEach((key, colIndex) => {
-        const x1 = startX + firstColWidth + colIndex * cellWidth;
-        const x2 = x1 + cellWidth;
+        const leftX = startX + firstColWidth + colIndex * cellWidth;
+        const rightX = leftX + cellWidth;
 
         // 從建立好的 rowMap 取值
         const row = this.rowMap.get(key);
@@ -188,8 +188,8 @@ class TableLayout {
         cells.push({
           text: this.truncateText(val, Math.max(0, cellWidth - padding), dataCellFont),
           bbox: {
-            topLeft: { x: x1, y: y1 },
-            bottomRight: { x: x2, y: y2 },
+            topLeft: { x: leftX, y: topY },
+            bottomRight: { x: rightX, y: bottomY },
           },
           fontSize: styles.dataCell.fontSize,
           fontFamily: styles.dataCell.fontFamily,
@@ -202,14 +202,14 @@ class TableLayout {
 
     // 繪製最後一列的截斷提示 "⋮" (vertical ellipsis)
     if (isTruncated && maxPossibleRows > 0) {
-      const y1 = startY + headerHeight + displayMetrics.length * cellHeight;
-      const y2 = y1 + cellHeight;
+      const topY = startY + headerHeight + displayMetrics.length * cellHeight;
+      const bottomY = topY + cellHeight;
 
       cells.push({
         text: '⋮',
         bbox: {
-          topLeft: { x: startX, y: y1 },
-          bottomRight: { x: startX + totalWidth, y: y2 },
+          topLeft: { x: startX, y: topY },
+          bottomRight: { x: startX + totalWidth, y: bottomY },
         },
         fontSize: styles.rowHeader.fontSize, // 沿用 rowHeader 字體大小
         fontFamily: styles.rowHeader.fontFamily,
